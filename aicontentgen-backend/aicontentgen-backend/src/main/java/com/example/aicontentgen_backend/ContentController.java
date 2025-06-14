@@ -7,7 +7,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "https://socialmediacaptiongenerator-react.onrender.com") // Adjust if needed
+@CrossOrigin(origins = {"http://localhost:5173", "https://socialmediacaptiongenerator-react.onrender.com"})
 public class ContentController {
 
     private final AIContentGenerator contentGenerator;
