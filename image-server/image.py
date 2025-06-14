@@ -1,49 +1,67 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS 
+import os
 import cv2
-import numpy as np
+import tempfile
+import requests
 
 app = Flask(__name__)
-CORS(app, origins=["https://socialmediacaptiongenerator-react.onrender.com"])
+CORS(app)  
 
-# Load Haar cascades
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
-body_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fullbody.xml')
+def analyze_image(image_path):
+    image = cv2.imread(image_path)
+    if image is None:
+        raise ValueError(f"Could not load image from path: {image_path}")
 
-def analyze_image(image_file):
-    # Decode image bytes to OpenCV image
-    img = cv2.imdecode(np.frombuffer(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # Detect objects
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-    eyes = eye_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-    bodies = body_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3)
+    face_cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+    )
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
-    # Compose caption parts
-    parts = []
-    if len(faces) > 0:
-        parts.append(f"{len(faces)} face{'s' if len(faces) > 1 else ''}")
-    if len(eyes) > 0:
-        parts.append(f"{len(eyes)} eye{'s' if len(eyes) > 1 else ''}")
-    if len(bodies) > 0:
-        parts.append(f"{len(bodies)} full body figure{'s' if len(bodies) > 1 else ''}")
+    height, width = image.shape[:2]
+    summary = f"The image is {width}x{height} pixels. "
 
-    if parts:
-        caption = "This photo shows " + ", ".join(parts) + " — capturing a vivid moment."
+    if isinstance(faces, tuple) or len(faces) == 0:
+        summary += "No faces detected."
     else:
-        caption = "A serene scene with subtle details inviting peaceful reflection."
+        summary += f"It contains {len(faces)} face(s)."
 
-    return caption
+    return summary
 
-@app.route('/analyze', methods=['POST'])
+@app.route("/analyze", methods=["POST"])
 def analyze():
-    if 'photo' not in request.files:
-        return jsonify({"error": "No photo uploaded"}), 400
+    if "image" not in request.files:
+        return jsonify({"error": "No image uploaded"}), 400
 
-    photo_file = request.files['photo']
-    caption = analyze_image(photo_file)
+    image_file = request.files["image"]
+    temp_path = os.path.join(tempfile.gettempdir(), image_file.filename)
+    image_file.save(temp_path)
+
+    summary = analyze_image(temp_path)
+
+    # Send to Spring Boot to generate caption
+    payload = {
+        "prompt": f"Create a caption for a social media post: {summary}",
+        "tone": "friendly",
+        "length": "short",
+        "format": "paragraph"
+    }
+
+    try:
+        response = requests.post("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", json=payload)
+        response.raise_for_status()
+        caption = response.text
+    except Exception as e:
+        caption = f"Error calling Java backend: {str(e)}"
+
+    return jsonify({"summary": summary, "caption": caption})
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
+
 
     return jsonify({"caption": caption})
 
