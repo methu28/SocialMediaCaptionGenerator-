@@ -50,7 +50,7 @@ def analyze():
     }
 
     try:
-        response = requests.post("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", json=payload)
+        response = requests.post("https://socialmediacaptiongenerator-boot.onrender.com", json=payload)
         response.raise_for_status()
         caption = response.text
     except Exception as e:
