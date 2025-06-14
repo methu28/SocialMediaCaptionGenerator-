@@ -66,13 +66,13 @@ function App() {
   if (!selectedFile) return;
 
   const formData = new FormData();
-  formData.append("photo", selectedFile); // <- Important change here
+  formData.append("image", selectedFile);  // <-- key must match backend
 
   try {
     const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
       method: "POST",
       body: formData,
-      mode: "cors", 
+      mode: "cors",
     });
 
     if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
