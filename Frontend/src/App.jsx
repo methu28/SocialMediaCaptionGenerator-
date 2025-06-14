@@ -69,7 +69,7 @@ function App() {
   formData.append("photo", selectedFile); // <- Important change here
 
   try {
-    const response = await fetch("https://your-flask-app-name.onrender.com/analyze", {
+    const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
       method: "POST",
       body: formData,
     });
