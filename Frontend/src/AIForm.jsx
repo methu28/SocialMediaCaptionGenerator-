@@ -12,7 +12,7 @@ function AIForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/generate", {
+      const response = await axios.post("https://socialmediacaptiongenerator-boot.onrender.com", {
         prompt,
         tone,
         length,
