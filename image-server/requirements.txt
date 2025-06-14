@@ -2,3 +2,4 @@ flask
 Gunicorn
 Flask-CORS
 opencv-python
+.requests
