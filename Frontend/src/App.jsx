@@ -18,7 +18,7 @@ function App() {
 
   const handleGenerateText = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/generate", {
+      const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,7 +46,7 @@ function App() {
 
   const handleSuggestEnhancements = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/suggest", {
+      const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: generatedText }),
@@ -69,7 +69,7 @@ function App() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await fetch("http://localhost:5000/analyze", {
+      const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com", {
         method: "POST",
         body: formData,
       });
