@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
 import cv2
+import tempfile
+import os
 
 app = Flask(__name__)
-CORS(app)  # Allow CORS from your React frontend
+# Allow your frontend domain explicitly
+CORS(app, origins=["https://socialmediacaptiongenerator-react.onrender.com"])
 
 def analyze_image(image_file):
     """Analyze the uploaded photo and generate a rich caption suitable for social media."""
