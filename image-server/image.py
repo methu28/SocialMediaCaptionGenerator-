@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import cv2
-import tempfile
 
 app = Flask(__name__)
 CORS(app)  # Allow CORS from your React frontend
@@ -21,13 +20,13 @@ def analyze_image(image_file):
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    """API endpoint to handle photo upload and return a rich caption."""
     if 'photo' not in request.files:
         return jsonify({"error": "No photo uploaded"}), 400
     
     photo_file = request.files['photo']
 
-    caption = analyze_image(photo_file)
+    # Perform your image analysis here
+    caption = "This is a nice photo without specifying dimensions."
 
     return jsonify({"caption": caption})
 
