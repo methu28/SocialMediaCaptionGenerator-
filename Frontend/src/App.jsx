@@ -72,6 +72,7 @@ function App() {
     const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
       method: "POST",
       body: formData,
+      mode: "cors", 
     });
 
     if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
