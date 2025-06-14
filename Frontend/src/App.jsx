@@ -18,7 +18,7 @@ function App() {
 
   const handleGenerateText = async () => {
     try {
-      const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com", {
+      const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
