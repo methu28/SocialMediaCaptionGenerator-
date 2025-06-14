@@ -1,3 +1,4 @@
 flask
-flask-cors
+Gunicorn
+Flask-CORS
 opencv-python
