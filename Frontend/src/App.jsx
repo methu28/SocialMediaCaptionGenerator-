@@ -69,7 +69,7 @@ function App() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com", {
+      const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
         method: "POST",
         body: formData,
       });
