@@ -46,7 +46,7 @@ function App() {
 
   const handleSuggestEnhancements = async () => {
     try {
-      const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", {
+      const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com/api/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: generatedText }),
