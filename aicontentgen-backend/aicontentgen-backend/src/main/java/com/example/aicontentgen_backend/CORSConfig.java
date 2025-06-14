@@ -8,7 +8,7 @@ public class CORSConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:5173")  // <-- change to 5174 here
+            .allowedOrigins("https://socialmediacaptiongenerator-react.onrender.com")  // <-- change to 5174 here
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true);
