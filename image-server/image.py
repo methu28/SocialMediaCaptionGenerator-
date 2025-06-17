@@ -3,17 +3,17 @@ from flask_cors import CORS
 import os
 import cv2
 import tempfile
-import requests
 
 app = Flask(__name__)
 
-# Allow requests from your React's domain
+# Allow only your React's domain to connect
 CORS(app, origins=['https://socialmediacaptiongenerator-react.onrender.com'])
 
 def analyze_image(image_path):
+    """Analyze the photo and return a short summary."""
     image = cv2.imread(image_path)
     if image is None:
-        raise ValueError(f"Could not load image from path: {image_path}")
+        return "Unable to read the photo."
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -22,15 +22,10 @@ def analyze_image(image_path):
     )
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
-    height, width = image.shape[:2]
-    summary = f"The image is {width}x{height} pixels. "
-
-    if isinstance(faces, tuple) or len(faces) == 0:
-        summary += "No faces detected."
+    if len(faces) == 0:
+        return "No faces were detected in the photo."
     else:
-        summary += f"It contains {len(faces)} face(s)."
-
-    return summary
+        return f"The photo shows {len(faces)} face(s)"
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -38,29 +33,13 @@ def analyze():
         return jsonify({"error": "No image uploaded"}), 400
 
     image_file = request.files["image"]
-    temp_path = os.path.join(tempfile.gettempdir(), image_file.filename)
-    image_file.save(temp_path)
+    temp_file = os.path.join(tempfile.gettempdir(), image_file.filename)
+    image_file.save(temp_file)
 
-    summary = analyze_image(temp_path)
+    summary = analyze_image(temp_file)
 
-    # Send to Spring Boot to generate caption
-    payload = {
-        "prompt": f"Create a caption for a social media post: {summary}",
-        "tone": "friendly",
-        "length": "short",
-        "format": "paragraph"
-    }
-
-    try:
-        response = requests.post("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", json=payload)
-        response.raise_for_status()
-        caption = response.text
-    except Exception as e:
-        caption = f"Error calling Java backend: {str(e)}"
-
-    return jsonify({"summary": summary, "caption": caption})
+    return jsonify({"summary": summary})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
