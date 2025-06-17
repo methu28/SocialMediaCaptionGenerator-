@@ -21,19 +21,10 @@ function App() {
       const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt,
-          platform,
-          brandVoice,
-          audience,
-          seoKeywords,
-          tone,
-          length,
-          format,
-        }),
+        body: JSON.stringify({ prompt, platform, brandVoice, audience, seoKeywords, tone, length, format })
       });
 
-      if (!response.ok) throw new Error(HTTP error! ${response.status});
+      if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
 
       const data = await response.text();
       setGeneratedText(data);
@@ -49,10 +40,10 @@ function App() {
       const response = await fetch("https://socialmediacaptiongenerator-boot.onrender.com/api/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: generatedText }),
+        body: JSON.stringify({ text: generatedText })
       });
 
-      if (!response.ok) throw new Error(HTTP error! ${response.status});
+      if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
 
       const suggestion = await response.text();
       setSuggestedText(suggestion);
@@ -62,28 +53,28 @@ function App() {
     }
   };
 
- const handleImageUpload = async () => {
-  if (!selectedFile) return;
+  const handleImageUpload = async () => {
+    if (!selectedFile) return;
 
-  const formData = new FormData();
-  formData.append("image", selectedFile);  // <-- key must match backend
+    const formData = new FormData();
+    formData.append("image", selectedFile);  // <-- key must match backend
 
-  try {
-    const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
-      method: "POST",
-      body: formData,
-      mode: "cors",
-    });
+    try {
+      const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
+        method: "POST",
+        body: formData,
+        mode: "cors",
+      });
 
-    if (!response.ok) throw new Error(HTTP error! ${response.status});
+      if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
 
-    const data = await response.json();
-    setImageCaption(data.caption);
-  } catch (error) {
-    console.error("Error uploading image:", error);
-    setImageCaption("Failed to analyze image.");
-  }
-};
+      const data = await response.json();
+      setImageCaption(data.caption);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setImageCaption("Failed to analyze image.");
+    }
+  };
 
 
   return (
@@ -97,12 +88,7 @@ function App() {
           placeholder="Enter prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "0.5rem",
-            height: "100px",
-            marginBottom: "1rem",
-          }}
+          style={{ width: "100%", padding: "0.5rem", height: "100px", marginBottom: "1rem" }}
         />
 
         <div>
@@ -192,16 +178,12 @@ function App() {
           <>
             <h3 style={{ marginTop: "2rem" }}>Generated Content</h3>
             <div
-              style={{
-                whiteSpace: "pre-wrap",
-                border: "1px solid #ccc",
-                padding: "1rem",
-              }}
+              style={{ whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: "1rem" }}
             >
               {generatedText}
             </div>
 
-            <button style={{ marginTop: "1rem" }} onClick={handleSuggestEnhancements}>
+            <button style={{ marginTop: "1rem" }} onClick={handleSuggestEnhishments}>
               Suggest Enhancements
             </button>
 
@@ -209,18 +191,16 @@ function App() {
               <>
                 <h3 style={{ marginTop: "1rem" }}>Suggested Improvements</h3>
                 <div
-                  style={{
-                    whiteSpace: "pre-wrap",
-                    border: "1px solid #ccc",
-                    padding: "1rem",
-                  }}
-                >
-                  {suggestedText}
-                </div>
-              </>
+                   style={{ whiteSpace: "pre-wrap", border: "1px solid #ccc", padding: "1rem" }}
+                 >
+                   {suggestedText}
+                 </div>
+               </>
             )}
+
           </>
         )}
+
       </section>
 
       {/* Image Upload Section */}
@@ -241,6 +221,7 @@ function App() {
             <div>{imageCaption}</div>
           </div>
         )}
+
       </section>
     </div>
   );
