@@ -183,7 +183,7 @@ function App() {
               {generatedText}
             </div>
 
-            <button style={{ marginTop: "1rem" }} onClick={handleSuggestEnhishments}>
+            <button style={{ marginTop: "1rem" }} onClick={handleSuggestEnhancements}>
               Suggest Enhancements
             </button>
 
