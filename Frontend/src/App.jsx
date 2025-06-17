@@ -63,7 +63,7 @@ function App() {
   formData.append('format', format);
 
   try {
-    const response = await fetch("https://your-flask-app.onrender.com/analyze", {
+    const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
       method: "POST",
       body: formData,
     });
