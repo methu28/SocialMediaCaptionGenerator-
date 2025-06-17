@@ -53,30 +53,44 @@ function App() {
     }
   };
 
- const handleImageUpload = async () => {
+const handleImageUpload = async () => {
   if (!selectedFile) return;
 
   const formData = new FormData();
   formData.append('image', selectedFile);
-  formData.append('tone', tone);
-  formData.append('length', length);
-  formData.append('format', format);
-
+  
   try {
+    // 1️⃣ Send photo to Flask first
     const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
       method: "POST",
       body: formData,
     });
 
-    if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
+    if (!response.ok) throw new Error(`Flask Error: ${response.status}`);
 
-    const data = await response.json();
-    setImageCaption(data.caption);
+    const { summary } = await response.json();
+
+    // 2️⃣ Send summary to Spring to generate caption
+    const generateResponse = await fetch("https://your-spring-boot-app.onrender.com/api/generate", { 
+      // <- replace with your Spring backend's URL
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: `Create a caption for a social media post: ${summary}` })
+    });
+
+    if (!generateResponse.ok) throw new Error(`Spring Error: ${generateResponse.status}`);
+
+    const caption = await generateResponse.text();
+
+    // 3️⃣ Update state with final caption
+    setImageCaption(caption);
   } catch (error) {
-    console.error("Error uploading image:", error);
-    setImageCaption("Failed to analyze image.");
+    console.error("Error uploading and generating caption:", error);
+    setImageCaption("Failed to generate caption.");
   }
 };
+
+
 
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
