@@ -53,29 +53,30 @@ function App() {
     }
   };
 
-  const handleImageUpload = async () => {
-    if (!selectedFile) return;
+ const handleImageUpload = async () => {
+  if (!selectedFile) return;
 
-    const formData = new FormData();
-    formData.append("image", selectedFile);  // <-- key must match backend
+  const formData = new FormData();
+  formData.append('image', selectedFile);
+  formData.append('tone', tone);
+  formData.append('length', length);
+  formData.append('format', format);
 
-    try {
-      const response = await fetch("https://socialmediacaptiongenerator-flask.onrender.com/analyze", {
-        method: "POST",
-        body: formData,
-        mode: "cors",
-      });
+  try {
+    const response = await fetch("https://your-flask-app.onrender.com/analyze", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
+    if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
 
-      const data = await response.json();
-      setImageCaption(data.caption);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      setImageCaption("Failed to analyze image.");
-    }
-  };
-
+    const data = await response.json();
+    setImageCaption(data.caption);
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    setImageCaption("Failed to analyze image.");
+  }
+};
 
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
