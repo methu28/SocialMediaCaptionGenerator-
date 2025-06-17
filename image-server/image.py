@@ -1,14 +1,15 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS 
+from flask_cors import CORS
 import os
 import cv2
 import tempfile
 import requests
 
 app = Flask(__name__)
-CORS(app)  
+CORS(app)
 
 def analyze_image(image_path):
+    """Analyze an image to find dimensions and number of faces."""
     image = cv2.imread(image_path)
     if image is None:
         raise ValueError(f"Could not load image from path: {image_path}")
@@ -32,23 +33,28 @@ def analyze_image(image_path):
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    """Analyze an uploaded photo and generate a caption for it."""
     if "image" not in request.files:
         return jsonify({"error": "No image uploaded"}), 400
 
     image_file = request.files["image"]
-    temp_path = os.path.join(tempfile.gettempdir(), image_file.filename)
-    image_file.save(temp_path)
+    temp_file = os.path.join(tempfile.gettempdir(), image_file.filename)
+    image_file.save(temp_file)
 
-    summary = analyze_image(temp_path)
+    summary = analyze_image(temp_file)
 
-    # Send to Spring Boot to generate caption
+    # Retrieve optional settings from form
+    tone = request.form.get("tone", "neutral")
+    length = request.form.get("length", "short")
+    fmt = request.form.get("format", "paragraph")
+    prompt = f"Create a caption for a social media post: {summary}"
+
     payload = {
-        "prompt": f"Create a caption for a social media post: {summary}",
-        "tone": "friendly",
-        "length": "short",
-        "format": "paragraph"
+        "prompt": prompt,
+        "tone": tone,
+        "length": length,
+        "format": fmt
     }
-
     try:
         response = requests.post("https://socialmediacaptiongenerator-boot.onrender.com/api/generate", json=payload)
         response.raise_for_status()
@@ -59,4 +65,5 @@ def analyze():
     return jsonify({"summary": summary, "caption": caption})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
